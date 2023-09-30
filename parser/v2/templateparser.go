@@ -60,7 +60,7 @@ type templateNodeParser[TUntil any] struct {
 
 var rawElements = parse.Any[RawElement](styleElement, scriptElement)
 
-var comment = parse.Any[Comment](htmlComment)
+var comment = parse.Any[HTMLComment](htmlComment)
 
 func (p templateNodeParser[T]) Parse(pi *parse.Input) (op []Node, ok bool, err error) {
 	for {
@@ -92,7 +92,7 @@ func (p templateNodeParser[T]) Parse(pi *parse.Input) (op []Node, ok bool, err e
 
 		// Try for a comment.
 		// <!--
-		var commentNode Comment
+		var commentNode HTMLComment
 		commentNode, ok, err = comment.Parse(pi)
 		if err != nil {
 			return

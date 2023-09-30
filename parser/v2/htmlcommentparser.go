@@ -12,7 +12,7 @@ type commentParser struct {
 
 var htmlComment = commentParser{}
 
-func (p commentParser) Parse(pi *parse.Input) (c Comment, ok bool, err error) {
+func (p commentParser) Parse(pi *parse.Input) (c HTMLComment, ok bool, err error) {
 	// Comment start.
 	if _, ok, err = htmlCommentStart.Parse(pi); err != nil || !ok {
 		return

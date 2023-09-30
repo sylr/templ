@@ -96,12 +96,18 @@ type Expression struct {
 }
 
 type TemplateFile struct {
+	Header  []HeaderFileNode
 	Package Package
 	Nodes   []TemplateFileNode
 }
 
 func (tf TemplateFile) Write(w io.Writer) error {
 	var indent int
+	for i := 0; i < len(tf.Header); i++ {
+		if err := tf.Header[i].Write(w, indent); err != nil {
+			return err
+		}
+	}
 	if err := tf.Package.Write(w, indent); err != nil {
 		return err
 	}
@@ -117,6 +123,11 @@ func (tf TemplateFile) Write(w io.Writer) error {
 		}
 	}
 	return nil
+}
+
+type HeaderFileNode interface {
+	IsHeaderFileNode() bool
+	Write(w io.Writer, indent int) error
 }
 
 // TemplateFileNode can be a Template, CSS, Script or Go.
@@ -156,7 +167,9 @@ type Whitespace struct {
 	Value string
 }
 
-func (ws Whitespace) IsNode() bool { return true }
+// IsHeaderFileNode allows this node to be included before the package expression in a template.
+func (ws Whitespace) IsHeaderFileNode() bool { return true }
+func (ws Whitespace) IsNode() bool           { return true }
 
 func (ws Whitespace) Write(w io.Writer, indent int) error {
 	if ws.Value == "" || !strings.Contains(ws.Value, "\n") {
@@ -662,17 +675,34 @@ func (ca ConditionalAttribute) Write(w io.Writer, indent int) error {
 	return nil
 }
 
-// Comments.
-type Comment struct {
+// Nodes.
+
+// HTMLComment is a representation of a HTML comment.
+type HTMLComment struct {
 	Contents string
 }
 
-func (c Comment) IsNode() bool { return true }
-func (c Comment) Write(w io.Writer, indent int) error {
+func (c HTMLComment) IsNode() bool { return true }
+func (c HTMLComment) Write(w io.Writer, indent int) error {
 	return writeIndent(w, indent, "<!--"+c.Contents+"-->")
 }
 
-// Nodes.
+// GoComment is a representation of a Go comment.
+type GoComment struct {
+	IsBlock  bool
+	Contents string
+}
+
+// IsHeaderFileNode allows this node to be included before the package expression in a template.
+func (c GoComment) IsHeaderFileNode() bool { return true }
+func (c GoComment) IsNode() bool           { return true }
+func (c GoComment) Write(w io.Writer, indent int) error {
+	prefix, suffix := "//", "\n"
+	if c.IsBlock {
+		prefix, suffix = "/*", "*/"
+	}
+	return writeIndent(w, indent, prefix+c.Contents+suffix)
+}
 
 // CallTemplateExpression can be used to create and render a template using data.
 // {! Other(p.First, p.Last) }

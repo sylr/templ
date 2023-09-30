@@ -77,6 +77,31 @@ func (p TemplateFileParser) Parse(pi *parse.Input) (tf TemplateFile, ok bool, er
 		return tf, false, ErrLegacyFileFormat
 	}
 
+	// Optional whitespace and comments.
+	for {
+		var ws Whitespace
+		ws.Value, ok, err = parse.Whitespace.Parse(pi)
+		if err != nil {
+			return tf, false, err
+		}
+		if ok {
+			tf.Header = append(tf.Header, ws)
+			continue
+		}
+		var c GoComment
+		c, ok, err = goComment.Parse(pi)
+		if err != nil {
+			return tf, false, err
+		}
+		if ok {
+			tf.Header = append(tf.Header, c)
+			continue
+		}
+		break
+	}
+
+	// Comments.
+
 	// Required package.
 	// package name
 	from := pi.Position()

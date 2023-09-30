@@ -471,7 +471,7 @@ func (g *generator) writeNode(indentLevel int, current parser.Node) (err error) 
 		err = g.writeDocType(indentLevel, n)
 	case parser.Element:
 		err = g.writeElement(indentLevel, n)
-	case parser.Comment:
+	case parser.HTMLComment:
 		err = g.writeComment(indentLevel, n)
 	case parser.ChildrenExpression:
 		err = g.writeChildrenExpression(indentLevel)
@@ -1165,7 +1165,7 @@ func (g *generator) writeRawElement(indentLevel int, n parser.RawElement) (err e
 	return err
 }
 
-func (g *generator) writeComment(indentLevel int, c parser.Comment) (err error) {
+func (g *generator) writeComment(indentLevel int, c parser.HTMLComment) (err error) {
 	// <!--
 	if _, err = g.w.WriteStringLiteral(indentLevel, "<!--"); err != nil {
 		return err
