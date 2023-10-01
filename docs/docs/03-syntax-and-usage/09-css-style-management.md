@@ -161,7 +161,7 @@ css className() {
 }
 
 templ button(text string, isPrimary bool) {
-	<button class={ "button", className, templ.KV(primaryClassName, isPrimary) }>{ text }</button>
+	<button class={ "button", className, templ.KV(primaryClassName(), isPrimary) }>{ text }</button>
 }
 ```
 

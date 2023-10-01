@@ -181,7 +181,7 @@ func KVExample() templ.Component {
 		if err != nil {
 			return err
 		}
-		var var_10 = []any{"a", "b", "c", templ.KV("c", false)}
+		var var_10 = []any{"a", "b", "c", templ.KV("c", false), templ.KV(green(), false)}
 		err = templ.RenderCSSItems(ctx, templBuffer, var_10...)
 		if err != nil {
 			return err
