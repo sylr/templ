@@ -26,3 +26,4 @@ result
 
 # Go workspace.
 go.work
+!examples/go.work
